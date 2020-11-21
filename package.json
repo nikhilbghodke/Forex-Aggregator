@@ -24,7 +24,7 @@
   },
   "scripts": {
     "start": "serve -s build -l 3000",
-    "build": "sudo npm i -g serve&&react-scripts build",
+    "build": " npm i -g serve&&react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "dev": "react-scripts start"
