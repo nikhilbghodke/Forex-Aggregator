@@ -3,7 +3,6 @@
   "version": "1.9.0",
   "description": "Material Dashboard React. Coded by Creative Tim",
   "private": false,
-
   "dependencies": {
     "@material-ui/core": "4.10.0",
     "@material-ui/icons": "4.9.1",
@@ -20,18 +19,16 @@
     "react-google-maps": "9.4.5",
     "react-router-dom": "5.2.0",
     "react-scripts": "3.4.1",
-    "react-swipeable-views": "0.13.9"
+    "react-swipeable-views": "0.13.9",
+    "serve": "^11.3.2"
   },
   "scripts": {
-    "start": "http-server build",
-    "build": "react-scripts build",
+    "start": "serve -s build -l 3000",
+    "build": "sudo npm i -g serve&&react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "dev":  "react-scripts start"
+    "dev": "react-scripts start"
   },
-  
-  
-  
   "optionalDependencies": {
     "@types/googlemaps": "3.39.6",
     "@types/markerclustererplus": "2.1.33",
