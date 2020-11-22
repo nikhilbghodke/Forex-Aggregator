@@ -112,7 +112,7 @@ export default function SignInSide() {
             <Grid container style={{display:"flex", justifyContent:"flex-end"}}>
               
               <Grid item>
-                <Link href="/signUp" variant="body2">
+                <Link href="/#/signUp" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
