@@ -65,6 +65,9 @@ const cardStyles= makeStyles(cardStlyesObj)
 
 export default function UserProfile() {
   const [value, setValue] = React.useState(3);
+  const [from, setFrom] = React.useState("USD");
+  const [to,setTo]=React.useState("EUR")
+  const [filter,setFilter]=React.useState("Lowest")
   const classes = useStyles();
   const classes2= cardStyles()
   return (
@@ -124,7 +127,7 @@ export default function UserProfile() {
                 
               </p>
               </div>
-            <CurrencyMenu filter={false}/>
+            <CurrencyMenu showFilter={false} to={to} from={from} filter={filter} setFilter={setFilter} setFrom={setFrom} setTo={setTo}  />
             </CardBody>
             <CardFooter chart>
               <div className={classes.stats}>
