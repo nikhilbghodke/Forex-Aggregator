@@ -53,10 +53,11 @@ export default function Dashboard() {
   const [providers,setProviders]=useState([])
   const [from, setFrom] = React.useState("USD");
   const [to,setTo]=React.useState("EUR")
-  const [filter,setFilter]=React.useState("Lowest")
+  const [filter,setFilter]=React.useState("Rating")
+  const[quantity,setQuantity]=React.useState(10)
   
   const getData=async ()=>{
-    let res= await axios.get("/allforexProviders?limit=10")
+    let res= await axios.get("/allforexProviders?limit="+quantity)
     console.log(res.data)
     setProviders(res.data)
   }
@@ -65,31 +66,42 @@ export default function Dashboard() {
     getData()
     let id=setInterval(getData,60000)
     return ()=>clearInterval(id)
-  },[])
+  },[quantity])
+
+  const sortComparator=(a,b)=>{
+    let bidA=a.rates.length!=0?a.rates[0][`${from}${to}`].bid:0
+    let bidB=b.rates.length!=0?b.rates[0][`${from}${to}`].bid:0
+    if(filter=="Lowest")
+      return bidA-bidB
+    if(filter=="Highest")
+      return bidB-bidA
+    if(filter=="Rating")
+      return b.stars-a.stars 
+  }
 
   const getCards=()=>{
-
-    return (providers.map((provider,idx)=>(
-    <GridItem xs={12} sm={12} md={4} key={provider._id}>
+    
+    return (providers.sort(sortComparator).map((provider,idx)=>(
+    <GridItem xs={12} sm={12} md={10} key={provider._id}>
       <Card chart>
         <CardHeader color="success">
           <Charts data={provider.rates.reduce((prev,rate)=>{
             
             let date=new Date(rate.createdAt.valueOf())
-            date.setHours(date.getHours() + 5);
-            date.setMinutes(date.getMinutes() + 30);
+            // date.setHours(date.getHours() + 5);
+            // date.setMinutes(date.getMinutes() + 30);
             console.log(date)
-            prev.data.labels.push(date.getHours()+":"+date.getMinutes());
-            //prev.data.dataseries[0].push(rate[`${from}${to}`].rate)
-            prev.data.series[1].push(rate[`${from}${to}`].bid)
-            prev.data.series[2].push(rate[`${from}${to}`].ask)
+            prev.data.labels.unshift(date.getHours()+":"+date.getMinutes());
+
+            prev.data.series[1].unshift(rate[`${from}${to}`].bid)
+            prev.data.series[2].unshift(rate[`${from}${to}`].ask)
             prev.low=Math.min(prev.low,rate[`${from}${to}`].bid)
             prev.high=Math.max(prev.high,rate[`${from}${to}`].ask)
             return prev
           },{data:{labels:[],series:[[],[],[]]},high:0,low:100})}/>
         </CardHeader>
         <CardBody>
-          <Link to="provider/reuter">
+          <Link to={"provider/"+provider.title}>
         <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
           <div style={{display:"flex",justifyContent:"space-between"}}>
     <h4 className={classes.cardTitle}>{provider.title}</h4>
@@ -99,13 +111,13 @@ export default function Dashboard() {
           
             Bid rate{"  "}
             <span className={classes.successText}>
-              <ArrowUpward className={classes.upArrowCardCategory} /> 75$
+              <ArrowUpward className={classes.upArrowCardCategory} /> {provider.rates.length!=0?provider.rates[0][`${from}${to}`].bid:0}
             </span>
           </p>
           <p className={classes.cardCategory}>
             Offer rate {"  "}
             <span className={classes.dangerText}>
-              <ArrowDownward className={classes.upArrowCardCategory} /> 70$
+              <ArrowDownward className={classes.upArrowCardCategory} /> {provider.rates.length!=0?provider.rates[0][`${from}${to}`].ask:0}
             </span>
             
           </p>
@@ -114,7 +126,7 @@ export default function Dashboard() {
         
         <CardFooter chart>
           <div className={classes.stats}>
-            <AccessTime /> updated 4 minutes ago
+            <AccessTime /> updated {provider.rates.length!=0?(new Date().getMinutes()-new Date(provider.rates[0].createdAt).getMinutes()):0} minutes ago
           </div>
         </CardFooter>
       </Card>
@@ -197,21 +209,14 @@ export default function Dashboard() {
       </GridContainer>
 
       {/* //Menu bar for filter */}
-      <CurrencyMenu showFilter={true} to={to} from={from} filter={filter} setFilter={setFilter} setFrom={setFrom} setTo={setTo}/>
+      <CurrencyMenu showFilter={true} to={to} from={from} filter={filter} setFilter={setFilter} setFrom={setFrom} setTo={setTo} quantity={quantity} setQuantity={setQuantity}/>
 
 
       {/* forexcard */}
-      <GridContainer>
+      <GridContainer justify="center">
         {providers.length>0?getCards():""}
         
         
-
-
-
-
-
-
-
 
 
         <GridItem xs={12} sm={12} md={4}>

@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState,useEffect} from "react";
 // @material-ui/core components
 import { makeStyles,withStyles } from "@material-ui/core/styles";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -20,6 +20,7 @@ import Rating from '@material-ui/lab/Rating';
 import CurrencyMenu from "components/CurrencyMenu/CurrencyMenu"
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import Maps from "views/Maps/Maps"
+import Charts from "components/Charts/Charts.js"
 
 import {
   dailySalesChart,
@@ -33,6 +34,7 @@ import { Link } from "react-router-dom";
 import avatar from "assets/img/faces/marc.jpg";
 import cardStlyesObj from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import cardStyle from "assets/jss/material-dashboard-react/components/cardStyle";
+import axios from "axios"
 
 const styles = {
   cardCategoryWhite: {
@@ -63,13 +65,70 @@ const StyledRating = withStyles({
 const useStyles = makeStyles(styles);
 const cardStyles= makeStyles(cardStlyesObj)
 
-export default function UserProfile() {
+export default function UserProfile(props) {
+  const classes = useStyles();
+  const classes2= cardStyles()
+  const [provider,setProvider]=useState([])
   const [value, setValue] = React.useState(3);
   const [from, setFrom] = React.useState("USD");
   const [to,setTo]=React.useState("EUR")
   const [filter,setFilter]=React.useState("Lowest")
-  const classes = useStyles();
-  const classes2= cardStyles()
+  const[quantity,setQuantity]=React.useState(10)
+  const getData=async ()=>{
+    let res= await axios.get("/forexProviders/"+props.match.params.name+"?limit="+quantity)
+    //console.log(res.data)
+    setProvider(res.data)
+    console.log(res.data)
+  }
+  useEffect(()=>{
+    getData()
+    let id=setInterval(getData,60000)
+    return ()=>clearInterval(id)
+  },[quantity])
+
+  const getCards=()=>{
+    
+    return (
+    <GridItem xs={12} sm={12} md={12} key={provider._id}>
+      <Card chart>
+        <CardHeader color="success">
+          <Charts data={provider.rates.reduce((prev,rate)=>{
+            let date=new Date(rate.createdAt.valueOf())
+            prev.data.labels.unshift(date.getHours()+":"+date.getMinutes());
+            prev.data.series[1].unshift(rate[`${from}${to}`].bid)
+            prev.data.series[2].unshift(rate[`${from}${to}`].ask)
+            prev.low=Math.min(prev.low,rate[`${from}${to}`].bid)
+            prev.high=Math.max(prev.high,rate[`${from}${to}`].ask)
+            return prev
+          },{data:{labels:[],series:[[],[],[]]},high:0,low:100})}/>
+        </CardHeader>
+        <CardBody>
+          <Link to={"provider/"+provider.title}>
+        
+          <p className={classes2.cardCategory}>
+            Bid rate{"  "}
+            <span className={classes2.successText}>
+              <ArrowUpward className={classes2.upArrowCardCategory} /> {provider.rates.length!=0?provider.rates[0][`${from}${to}`].bid:0}
+            </span>
+          </p>
+          <p className={classes2.cardCategory}>
+            Offer rate {"  "}
+            <span className={classes2.dangerText}>
+              <ArrowDownward className={classes2.upArrowCardCategory} /> {provider.rates.length!=0?provider.rates[0][`${from}${to}`].ask:0}
+            </span>
+            
+          </p>
+          </Link>
+        </CardBody>
+        
+        <CardFooter chart>
+          <div className={classes.stats}>
+            <AccessTime /> updated {provider.rates.length!=0?(new Date().getMinutes()-new Date(provider.rates[0].createdAt).getMinutes()):0} minutes ago
+          </div>
+        </CardFooter>
+      </Card>
+  </GridItem>)
+  }
   return (
     <div>
       <GridContainer>
@@ -99,42 +158,17 @@ export default function UserProfile() {
           </Card>
         </GridItem>
       <GridItem xs={12} sm={12} md={8}>
-          <Card chart>
-            <CardHeader color="success">
-              <ChartistGraph
-                className="ct-chart"
-                data={dailySalesChart.data}
-                type="Line"
-                options={dailySalesChart.options}
-                listener={dailySalesChart.animation}
-              />
-            </CardHeader>
-            <CardBody>
-              
-              <div style={{display:"flex", justifyContent:"space-around"}}>
-              <p className={classes.cardCategory}>
-              
-                Bid rate{"  "}
-                <span className={classes2.successText}>
-                  <ArrowUpward className={classes.upArrowCardCategory} /> 75$
-                </span>
-              </p>
-              <p className={classes2.cardCategory}>
-                Offer rate {"  "}
-                <span className={classes2.dangerText}>
-                  <ArrowDownward className={classes2.upArrowCardCategory} /> 70$
-                </span>
-                
-              </p>
-              </div>
-            <CurrencyMenu showFilter={false} to={to} from={from} filter={filter} setFilter={setFilter} setFrom={setFrom} setTo={setTo}  />
-            </CardBody>
-            <CardFooter chart>
-              <div className={classes.stats}>
-                <AccessTime /> updated 4 minutes ago
-              </div>
-            </CardFooter>
-          </Card>
+          {provider.title?getCards():""}
+            
+
+
+
+            <CurrencyMenu showFilter={false} to={to} from={from} filter={filter} 
+            setFilter={setFilter} setFrom={setFrom} setTo={setTo}  quantity={quantity} setQuantity={setQuantity}/>
+            
+            
+            
+            
         </GridItem>
 
 
