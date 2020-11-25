@@ -71,7 +71,7 @@ export default function SignInSide(props) {
   const [email,setEmail]=useState("")
   const [password,setPassword] =useState("")
   const [error,setError]=useState(null)
-
+  
 
   
 
@@ -80,8 +80,9 @@ export default function SignInSide(props) {
     var res;
     try{
       res= await axios.post("/login",{email,password})
-      console.log(res)
-      res=res.data
+      console.log(res.data)
+      localStorage.setItem('user', JSON.stringify(res.data));
+
       setTokenHeader(res.token)
       props.history.push("/admin/dashboard")
     }
