@@ -30,7 +30,7 @@ export default function Charts ({data}){
                       left: 0
                     }
                   }}
-                listener={dailySalesChart.animation}
+                listener={emailsSubscriptionChart.animation}
                 
               />
     )

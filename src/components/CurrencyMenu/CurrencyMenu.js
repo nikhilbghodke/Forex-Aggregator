@@ -6,6 +6,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { Card } from '@material-ui/core';
+import Input from '@material-ui/core/Input';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -17,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function CurrencyMenu({showFilter,from,setFrom,to,setTo,filter,setFilter}) {
+export default function CurrencyMenu({showFilter,from,setFrom,to,setTo,filter,setFilter,quantity,setQuantity}) {
   const classes = useStyles();
   
 
@@ -82,12 +83,21 @@ export default function CurrencyMenu({showFilter,from,setFrom,to,setTo,filter,se
             setFilter(e.target.value)
           }}
         >
-          <MenuItem value={"Ratting"}>Ratting</MenuItem>
+          <MenuItem value={"Rating"}>Rating</MenuItem>
           <MenuItem value={"Lowest"}>Lowest</MenuItem>
           <MenuItem value={"Highest"}>Highest</MenuItem>
         </Select>
         <FormHelperText>Filter By</FormHelperText>
       </FormControl>:<span/>}
+      <FormControl className={classes.formControl}>
+        <InputLabel shrink id="from">
+          Quantity
+        </InputLabel>
+      <Input value={quantity} type="number" min={1} inputProps={{ 'aria-label': 'description',min: 1 }}  onChange={(e)=>{
+        setQuantity(e.target.value)
+      }}/>
+      <FormHelperText>Number of rates  you want to see</FormHelperText>
+      </FormControl>
       
     </Card>
   );
