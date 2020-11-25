@@ -44,7 +44,7 @@
   "bugs": {
     "url": "https://github.com/creativetimofficial/material-dashboard-react/issues"
   },
-  
+  "proxy":"https://polar-sands-16396.herokuapp.com",
   "optionalDependencies": {
     "@types/googlemaps": "3.39.6",
     "@types/markerclustererplus": "2.1.33",

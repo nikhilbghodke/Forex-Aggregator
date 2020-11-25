@@ -17,11 +17,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function CurrencyMenu(props) {
+export default function CurrencyMenu({showFilter,from,setFrom,to,setTo,filter,setFilter}) {
   const classes = useStyles();
-  const [from, setFrom] = React.useState("Dollar");
-  const [to,setTo]=React.useState("Euro")
-  const [filter,setFilter]=React.useState("Lowest")
+  
 
   
 
@@ -42,9 +40,9 @@ export default function CurrencyMenu(props) {
           }}
           
         >
-          <MenuItem value={"Dollar"}>Dollar</MenuItem>
-          <MenuItem value={"Euro"}>Euro</MenuItem>
-          <MenuItem value={"Ruppe"}>Indian Ruppe</MenuItem>
+          <MenuItem value={"USD"}>USD</MenuItem>
+          <MenuItem value={"EUR"}>EUR</MenuItem>
+          <MenuItem value={"INR"}>INR</MenuItem>
         </Select>
         <FormHelperText>You have this currency</FormHelperText>
       </FormControl>
@@ -64,13 +62,13 @@ export default function CurrencyMenu(props) {
           }}
           
         >
-          <MenuItem value={"Dollar"}>Dollar</MenuItem>
-          <MenuItem value={"Euro"}>Euro</MenuItem>
-          <MenuItem value={"Ruppe"}>Indian Ruppe</MenuItem>
+          <MenuItem value={"USD"}>USD</MenuItem>
+          <MenuItem value={"EUR"}>EUR</MenuItem>
+          <MenuItem value={"INR"}>INR</MenuItem>
         </Select>
         <FormHelperText>You want this currency</FormHelperText>
       </FormControl>
-      {props.filter?
+      {showFilter?
       <FormControl className={classes.formControl}>
         <InputLabel shrink id="filter">
           Filter By

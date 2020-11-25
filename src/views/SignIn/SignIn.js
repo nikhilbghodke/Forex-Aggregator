@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,13 +12,22 @@ import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import axios from "axios"
+import setTokenHeader from "services/api.js"
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+      <Link color="inherit" href="https://github.com/nikhilbghodke">
+        Nikhil Ghodke
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -57,11 +66,53 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignInSide() {
+export default function SignInSide(props) {
   const classes = useStyles();
+  const [email,setEmail]=useState("")
+  const [password,setPassword] =useState("")
+  const [error,setError]=useState(null)
+
+
+  
+
+  const onSubmit=async (e)=>{
+    e.preventDefault();
+    var res;
+    try{
+      res= await axios.post("/login",{email,password})
+      console.log(res)
+      res=res.data
+      setTokenHeader(res.token)
+      props.history.push("/admin/dashboard")
+    }
+    catch(e){
+      console.log(e.response.data.error.message)
+      setError(e.response.data.error.message)
+    }
+    
+    
+  }
+
+  const getSnackBars=()=>{
+    let ans="";
+    if(error){
+        return (
+
+      <Snackbar open={true} autoHideDuration={6000} onClose={()=>{setError(null)}}>
+        <Alert onClose={()=>{setError(null)}} severity="error">
+          {error}
+        </Alert>
+      </Snackbar>)
+    }
+    
+    
+  }
+
+
 
   return (
     <Grid container component="main" className={classes.root}>
+      {getSnackBars()}
       <CssBaseline />
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
       
@@ -73,7 +124,7 @@ export default function SignInSide() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form className={classes.form} noValidate>
+          <form className={classes.form} noValidate onSubmit={onSubmit}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -84,6 +135,8 @@ export default function SignInSide() {
               name="email"
               autoComplete="email"
               autoFocus
+              value={email}
+              onChange={(e)=>{setEmail(e.currentTarget.value)}}
             />
             <TextField
               variant="outlined"
@@ -94,7 +147,9 @@ export default function SignInSide() {
               label="Password"
               type="password"
               id="password"
+              value={password}
               autoComplete="current-password"
+              onChange={(e)=>{setPassword(e.currentTarget.value)}}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}

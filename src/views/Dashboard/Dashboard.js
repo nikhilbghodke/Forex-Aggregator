@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState, useEffect} from "react";
 // react plugin for creating charts
 import ChartistGraph from "react-chartist";
 // @material-ui/core
@@ -31,6 +31,8 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import Rating from '@material-ui/lab/Rating';
 import CurrencyMenu from "components/CurrencyMenu/CurrencyMenu.js"
+import Charts from 'components/Charts/Charts.js'
+import axios from "axios"
 import { bugs, website, server } from "variables/general.js";
 
 import {
@@ -48,6 +50,77 @@ const useStyles = makeStyles(styles);
 
 export default function Dashboard() {
   const classes = useStyles();
+  const [providers,setProviders]=useState([])
+  const [from, setFrom] = React.useState("USD");
+  const [to,setTo]=React.useState("EUR")
+  const [filter,setFilter]=React.useState("Lowest")
+  
+  const getData=async ()=>{
+    let res= await axios.get("/allforexProviders?limit=10")
+    console.log(res.data)
+    setProviders(res.data)
+  }
+  
+  useEffect(()=>{
+    getData()
+    let id=setInterval(getData,60000)
+    return ()=>clearInterval(id)
+  },[])
+
+  const getCards=()=>{
+
+    return (providers.map((provider,idx)=>(
+    <GridItem xs={12} sm={12} md={4} key={provider._id}>
+      <Card chart>
+        <CardHeader color="success">
+          <Charts data={provider.rates.reduce((prev,rate)=>{
+            
+            let date=new Date(rate.createdAt.valueOf())
+            date.setHours(date.getHours() + 5);
+            date.setMinutes(date.getMinutes() + 30);
+            console.log(date)
+            prev.data.labels.push(date.getHours()+":"+date.getMinutes());
+            //prev.data.dataseries[0].push(rate[`${from}${to}`].rate)
+            prev.data.series[1].push(rate[`${from}${to}`].bid)
+            prev.data.series[2].push(rate[`${from}${to}`].ask)
+            prev.low=Math.min(prev.low,rate[`${from}${to}`].bid)
+            prev.high=Math.max(prev.high,rate[`${from}${to}`].ask)
+            return prev
+          },{data:{labels:[],series:[[],[],[]]},high:0,low:100})}/>
+        </CardHeader>
+        <CardBody>
+          <Link to="provider/reuter">
+        <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
+          <div style={{display:"flex",justifyContent:"space-between"}}>
+    <h4 className={classes.cardTitle}>{provider.title}</h4>
+          <Rating  size="small" value={parseInt(provider.stars)} readOnly />
+          </div>
+          <p className={classes.cardCategory}>
+          
+            Bid rate{"  "}
+            <span className={classes.successText}>
+              <ArrowUpward className={classes.upArrowCardCategory} /> 75$
+            </span>
+          </p>
+          <p className={classes.cardCategory}>
+            Offer rate {"  "}
+            <span className={classes.dangerText}>
+              <ArrowDownward className={classes.upArrowCardCategory} /> 70$
+            </span>
+            
+          </p>
+          </Link>
+        </CardBody>
+        
+        <CardFooter chart>
+          <div className={classes.stats}>
+            <AccessTime /> updated 4 minutes ago
+          </div>
+        </CardFooter>
+      </Card>
+  </GridItem>)))
+  }
+  
   return (
     <div>
       <GridContainer>
@@ -123,92 +196,24 @@ export default function Dashboard() {
         </GridItem>
       </GridContainer>
 
+      {/* //Menu bar for filter */}
+      <CurrencyMenu showFilter={true} to={to} from={from} filter={filter} setFilter={setFilter} setFrom={setFrom} setTo={setTo}/>
 
-      <CurrencyMenu filter={true}/>
+
+      {/* forexcard */}
       <GridContainer>
-        <GridItem xs={12} sm={12} md={4}>
-          <Card chart>
-            <CardHeader color="success">
-              <ChartistGraph
-                className="ct-chart"
-                data={dailySalesChart.data}
-                type="Line"
-                options={dailySalesChart.options}
-                listener={dailySalesChart.animation}
-              />
-            </CardHeader>
-            <CardBody>
-              <Link to="provider/reuter">
-            <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
-              <div style={{display:"flex",justifyContent:"space-between"}}>
-              <h4 className={classes.cardTitle}>Reuters</h4>
-              <Rating  size="small" value={4} readOnly />
-              </div>
-              <p className={classes.cardCategory}>
-              
-                Bid rate{"  "}
-                <span className={classes.successText}>
-                  <ArrowUpward className={classes.upArrowCardCategory} /> 75$
-                </span>
-              </p>
-              <p className={classes.cardCategory}>
-                Offer rate {"  "}
-                <span className={classes.dangerText}>
-                  <ArrowDownward className={classes.upArrowCardCategory} /> 70$
-                </span>
-                
-              </p>
-              </Link>
-            </CardBody>
-            
-            <CardFooter chart>
-              <div className={classes.stats}>
-                <AccessTime /> updated 4 minutes ago
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={4}>
-          <Card chart>
-            <CardHeader color="success">
-              <ChartistGraph
-                className="ct-chart"
-                data={dailySalesChart.data}
-                type="Line"
-                options={dailySalesChart.options}
-                listener={dailySalesChart.animation}
-              />
-            </CardHeader>
-            <CardBody>
-            <Link to="provider/bloomberg">
-            <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
-              <div style={{display:"flex",justifyContent:"space-between"}}>
-              <h4 className={classes.cardTitle}>Bloomberg</h4>
-              <Rating  size="small" value={4} readOnly />
-              </div>
-              <p className={classes.cardCategory}>
-              
-                Bid rate{"  "}
-                <span className={classes.successText}>
-                  <ArrowUpward className={classes.upArrowCardCategory} /> 75$
-                </span>
-              </p>
-              <p className={classes.cardCategory}>
-                Offer rate {"  "}
-                <span className={classes.dangerText}>
-                  <ArrowDownward className={classes.upArrowCardCategory} /> 70$
-                </span>
-                
-              </p>
-              </Link>
-            </CardBody>
-            <CardFooter chart>
-              <div className={classes.stats}>
-                <AccessTime /> updated 4 minutes ago
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
+        {providers.length>0?getCards():""}
+        
+        
+
+
+
+
+
+
+
+
+
         <GridItem xs={12} sm={12} md={4}>
           <Card chart>
             <CardHeader color="warning">
