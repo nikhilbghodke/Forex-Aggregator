@@ -16,6 +16,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import axios from "axios"
 import setTokenHeader from "services/api.js"
+import {API_URL} from "constants.js"
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -67,7 +68,7 @@ export default function Form(props) {
     var res;
     let username=`@${firstname}_${lastname}`
     try{
-      res= await axios.post("/signup",{username,email,password})
+      res= await axios.post(`${API_URL}/signup`,{username,email,password})
       console.log(res)
       res=res.data
       setTokenHeader(res.token)

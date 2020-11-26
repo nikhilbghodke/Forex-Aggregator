@@ -42,7 +42,7 @@ import {
 } from "variables/charts.js";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
-import { IconButton } from "@material-ui/core";
+import { Grid, IconButton } from "@material-ui/core";
 import { ArrowDownward, NavigateBefore } from "@material-ui/icons";
 import { Link } from "react-router-dom";
 import {API_URL} from "constants.js"
@@ -64,7 +64,7 @@ export default function Dashboard() {
   
   useEffect(()=>{
     getData()
-    let id=setInterval(getData,60000)
+    let id=setInterval(getData,15000)
     return ()=>clearInterval(id)
   },[quantity])
 
@@ -81,10 +81,35 @@ export default function Dashboard() {
 
   const getCards=()=>{
     
-    return (providers.sort(sortComparator).map((provider,idx)=>(
+    return (providers.sort(sortComparator).map((provider,idx)=>{
+      let bidChange= provider.rates.length>1?((provider.rates[0][`${from}${to}`].bid-provider.rates[1][`${from}${to}`].bid)).toFixed(7):0;
+      let askChange= provider.rates.length>1?((provider.rates[0][`${from}${to}`].ask-provider.rates[1][`${from}${to}`].ask)).toFixed(7):0;
+      let spreadChange=(askChange-bidChange).toFixed(7)
+      let bid= provider.rates.length!=0?provider.rates[0][`${from}${to}`].bid:0
+      let ask= provider.rates.length!=0?provider.rates[0][`${from}${to}`].ask:0
+      let spread=(ask-bid).toFixed(7)
+      let endTime=new Date(provider.rates.length!=0?provider.rates[0].createdAt:Date.now).toLocaleTimeString()
+      let startTime=new Date(provider.rates.length!=0?provider.rates[provider.rates.length-1].createdAt:Date.now).toLocaleTimeString()
+      let highestBid=0,lowestBid=1000,highestAsk=0,lowestAsk=0,lowestSpread=Number.MAX_SAFE_INTEGER,highestSpread=Number.MIN_SAFE_INTEGER;
+      for(let rate of provider.rates){
+        let b=rate[`${from}${to}`].bid
+        let a=rate[`${from}${to}`].ask
+        let s=(a-b).toFixed(7)
+
+        highestBid=Math.max(highestBid,b)
+        lowestBid=Math.min(lowestBid,b)
+
+        highestAsk=Math.max(highestAsk,a)
+        lowestAsk=Math.min(lowestAsk,a)
+
+        highestSpread=Math.max(highestSpread,s)
+        lowestSpread=Math.min(lowestSpread,s)
+      }
+
+      return (
     <GridItem xs={12} sm={12} md={10} key={provider._id}>
       <Card chart>
-        <CardHeader color="success">
+        <CardHeader color={bidChange>0?"success":"primary"}>
           <Charts data={provider.rates.reduce((prev,rate)=>{
             
             let date=new Date(rate.createdAt.valueOf())
@@ -107,30 +132,127 @@ export default function Dashboard() {
     <h4 className={classes.cardTitle}>{provider.title}</h4>
           <Rating  size="small" value={parseInt(provider.stars)} readOnly />
           </div>
+          <GridContainer>
+            <GridItem xs={4}>
           <p className={classes.cardCategory}>
-          
             Bid rate{"  "}
-            <span className={classes.successText}>
-              <ArrowUpward className={classes.upArrowCardCategory} /> {provider.rates.length!=0?provider.rates[0][`${from}${to}`].bid:0}
+            <span className={bid>=0?classes.successText:classes.dangerText}>
+            {bid>=0?<ArrowUpward className={classes.upArrowCardCategory} />:<ArrowDownward className={classes.upArrowCardCategory} />}
+            {bid}
             </span>
           </p>
+          </GridItem>
+          <GridItem xs={4}>
           <p className={classes.cardCategory}>
-            Offer rate {"  "}
-            <span className={classes.dangerText}>
-              <ArrowDownward className={classes.upArrowCardCategory} /> {provider.rates.length!=0?provider.rates[0][`${from}${to}`].ask:0}
+            Ask rate {"  "}
+            <span className={ask>=0?classes.successText:classes.dangerText}>
+            {ask>=0?<ArrowUpward className={classes.upArrowCardCategory} />:<ArrowDownward className={classes.upArrowCardCategory} />} 
+              {ask}
             </span>
-            
           </p>
+          </GridItem>
+          <GridItem xs={4}>
+          <p className={classes.cardCategory}>
+            Spread rate {"  "}
+            <span className={spread>=0?classes.successText:classes.dangerText}>
+            {spread>=0?<ArrowUpward className={classes.upArrowCardCategory} />:<ArrowDownward className={classes.upArrowCardCategory} />} 
+              {spread}
+            </span>
+          </p>
+          </GridItem>
+          <GridItem xs={4}>
+          <p className={classes.cardCategory}>
+            Latest Bid Change {"  "}
+            <span className={bidChange>=0?classes.successText:classes.dangerText}>
+            {bidChange>=0?<ArrowUpward className={classes.upArrowCardCategory} />:<ArrowDownward className={classes.upArrowCardCategory} />} 
+              {bidChange}
+            </span>
+          </p>
+          </GridItem>
+          <GridItem xs={4}>
+          <p className={classes.cardCategory}>
+            Latest Ask Change {"  "}
+            <span className={askChange>=0?classes.successText:classes.dangerText}>
+            {askChange>=0?<ArrowUpward className={classes.upArrowCardCategory} />:<ArrowDownward className={classes.upArrowCardCategory} />} 
+              {askChange}
+            </span>
+          </p>
+          </GridItem>
+          <GridItem xs={4}>
+          <p className={classes.cardCategory}>
+            Latest Spread Change {"  "}
+            <span className={spreadChange>=0?classes.successText:classes.dangerText}>
+            {spreadChange>=0?<ArrowUpward className={classes.upArrowCardCategory} />:<ArrowDownward className={classes.upArrowCardCategory} />} 
+              {spreadChange}
+            </span>
+          </p>
+          </GridItem>
+          <GridItem xs={4}>
+          <p className={classes.cardCategory}>
+            Highest Bid {"   "}
+            <span >
+            {highestBid}
+            </span>
+          </p>
+          </GridItem>
+          <GridItem xs={4}>
+          <p className={classes.cardCategory}>
+            Highest Ask {"   "}
+            <span >
+            {highestAsk}
+            </span>
+          </p>
+          </GridItem>
+          <GridItem xs={4}>
+          <p className={classes.cardCategory}>
+            Highest Spread {"   "}
+            <span >
+            {highestSpread}
+            </span>
+          </p>
+          </GridItem>
+          <GridItem xs={4}>
+          <p className={classes.cardCategory}>
+            Lowest Bid {"   "}
+            <span >
+            {lowestBid}
+            </span>
+          </p>
+          </GridItem>
+          <GridItem xs={4}>
+          <p className={classes.cardCategory}>
+            Lowest Ask {"   "}
+            <span >
+            {lowestAsk}
+            </span>
+          </p>
+          </GridItem>
+          <GridItem xs={4}>
+          <p className={classes.cardCategory}>
+            Lowest Spread {"   "}
+            <span >
+            {lowestSpread}
+            </span>
+          </p>
+          </GridItem>
+          </GridContainer>
           </Link>
         </CardBody>
         
         <CardFooter chart>
+          
           <div className={classes.stats}>
             <AccessTime /> updated {provider.rates.length!=0?(new Date().getMinutes()-new Date(provider.rates[0].createdAt).getMinutes()):0} minutes ago
           </div>
+          <div className={classes.stats}>
+            <AccessTime /> Start Time {startTime}
+          </div>
+          <div className={classes.stats}>
+            <AccessTime /> Last Rate {endTime}
+          </div>
         </CardFooter>
       </Card>
-  </GridItem>)))
+  </GridItem>)}))
   }
   
   return (

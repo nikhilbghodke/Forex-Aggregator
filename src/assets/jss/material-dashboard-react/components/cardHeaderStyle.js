@@ -47,6 +47,7 @@ const cardHeaderStyle = {
       textAlign: "center",
       overflow: "unset",
       marginBottom: "1px"
+
     },
     "&$cardHeaderStats$cardHeaderIcon": {
       textAlign: "right"
@@ -91,30 +92,35 @@ const cardHeaderStyle = {
   },
   successCardHeader: {
     color: whiteColor,
+    transition:"color 3s ease-out",
     "&:not($cardHeaderIcon)": {
       ...successCardHeader
     }
   },
   dangerCardHeader: {
     color: whiteColor,
+    transition:"color 3s ease-out",
     "&:not($cardHeaderIcon)": {
       ...dangerCardHeader
     }
   },
   infoCardHeader: {
     color: whiteColor,
+    transition:"color 3s ease-out",
     "&:not($cardHeaderIcon)": {
       ...infoCardHeader
     }
   },
   primaryCardHeader: {
     color: whiteColor,
+    transition:"color 3s ease-out",
     "&:not($cardHeaderIcon)": {
       ...primaryCardHeader
     }
   },
   roseCardHeader: {
     color: whiteColor,
+    transition:"color 3s ease-out",
     "&:not($cardHeaderIcon)": {
       ...roseCardHeader
     }

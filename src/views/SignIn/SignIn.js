@@ -16,6 +16,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import axios from "axios"
 import setTokenHeader from "services/api.js"
+import {API_URL} from "constants.js"
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -79,7 +80,7 @@ export default function SignInSide(props) {
     e.preventDefault();
     var res;
     try{
-      res= await axios.post("/login",{email,password})
+      res= await axios.post(`${API_URL}/login`,{email,password})
       console.log(res.data)
       localStorage.setItem('user', JSON.stringify(res.data));
 

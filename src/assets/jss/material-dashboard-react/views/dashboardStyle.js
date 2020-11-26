@@ -8,10 +8,13 @@ import {
 
 const dashboardStyle = {
   successText: {
-    color: successColor[0]
+    color: successColor[0],
+    //backgroundColor:successColor[0],
+    transition:"color 10s ease-in-out",
   },
   dangerText:{
-    color:dangerColor[0]
+    color:dangerColor[0],
+    transition:"color 10s ease-in-out",
   },
   upArrowCardCategory: {
     width: "16px",

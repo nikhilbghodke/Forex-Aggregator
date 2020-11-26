@@ -123,7 +123,7 @@ export default function UserProfile(props) {
         </CardBody>
         
         <CardFooter chart>
-          <div className={classes.stats}>
+          <div className={classes2.stats}>
             <AccessTime /> updated {provider.rates.length!=0?(new Date().getMinutes()-new Date(provider.rates[0].createdAt).getMinutes()):0} minutes ago
           </div>
         </CardFooter>
