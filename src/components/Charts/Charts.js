@@ -24,10 +24,10 @@ export default function Charts ({data}){
                     low: data.low,
                     high: data.high, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
                     chartPadding: {
-                      top: 0,
+                      top: 1,
                       right: 0,
                       bottom: 0,
-                      left: 0
+                      left: 5
                     }
                   }}
                 listener={emailsSubscriptionChart.animation}

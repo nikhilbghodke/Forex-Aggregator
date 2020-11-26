@@ -35,6 +35,7 @@ import avatar from "assets/img/faces/marc.jpg";
 import cardStlyesObj from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import cardStyle from "assets/jss/material-dashboard-react/components/cardStyle";
 import axios from "axios"
+import {API_URL} from "constants.js"
 
 const styles = {
   cardCategoryWhite: {
@@ -75,7 +76,7 @@ export default function UserProfile(props) {
   const [filter,setFilter]=React.useState("Lowest")
   const[quantity,setQuantity]=React.useState(10)
   const getData=async ()=>{
-    let res= await axios.get("/forexProviders/"+props.match.params.name+"?limit="+quantity)
+    let res= await axios.get(`${API_URL}/forexProviders/`+props.match.params.name+"?limit="+quantity)
     //console.log(res.data)
     setProvider(res.data)
     console.log(res.data)

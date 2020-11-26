@@ -45,7 +45,7 @@ import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js"
 import { IconButton } from "@material-ui/core";
 import { ArrowDownward, NavigateBefore } from "@material-ui/icons";
 import { Link } from "react-router-dom";
-
+import {API_URL} from "constants.js"
 const useStyles = makeStyles(styles);
 
 export default function Dashboard() {
@@ -57,7 +57,7 @@ export default function Dashboard() {
   const[quantity,setQuantity]=React.useState(10)
   
   const getData=async ()=>{
-    let res= await axios.get("/allforexProviders?limit="+quantity)
+    let res= await axios.get(`${API_URL}/allforexProviders?limit=`+quantity)
     console.log(res.data)
     setProviders(res.data)
   }
