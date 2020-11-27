@@ -237,7 +237,7 @@ export default function UserProfile(props) {
                       rows: 5
                     }}
                     onChange={(event, newValue) => {
-                      setPost(newValue);
+                      setPost(event.target.value);
                     }}
                   />
                 </GridItem>

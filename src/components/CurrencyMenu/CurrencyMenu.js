@@ -7,6 +7,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { Card } from '@material-ui/core';
 import Input from '@material-ui/core/Input';
+import GridItem from 'components/Grid/GridItem';
+import GridContainer from   'components/Grid/GridContainer'
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -26,7 +28,8 @@ export default function CurrencyMenu({showFilter,from,setFrom,to,setTo,filter,se
 
   return (
     <Card style={{display:"flex",justifyContent:"space-evenly", marginBottom:"10px"}} elevation="10">
-      
+      <GridContainer>
+        <GridItem xs={6} md={4}>
       <FormControl className={classes.formControl}>
         <InputLabel shrink id="from">
           From
@@ -47,8 +50,9 @@ export default function CurrencyMenu({showFilter,from,setFrom,to,setTo,filter,se
         </Select>
         <FormHelperText>You have this currency</FormHelperText>
       </FormControl>
+      </GridItem>
 
-
+      <GridItem xs={6} md={4}>
       <FormControl className={classes.formControl}>
         <InputLabel shrink id="from">
           To
@@ -69,7 +73,9 @@ export default function CurrencyMenu({showFilter,from,setFrom,to,setTo,filter,se
         </Select>
         <FormHelperText>You want this currency</FormHelperText>
       </FormControl>
+      </GridItem>
       {showFilter?
+      <GridItem xs={6} md={4}>
       <FormControl className={classes.formControl}>
         <InputLabel shrink id="filter">
           Filter By
@@ -88,7 +94,10 @@ export default function CurrencyMenu({showFilter,from,setFrom,to,setTo,filter,se
           <MenuItem value={"Highest"}>Highest</MenuItem>
         </Select>
         <FormHelperText>Filter By</FormHelperText>
-      </FormControl>:<span/>}
+      </FormControl></GridItem>:<span/>}
+
+
+      <GridItem xs={6} md={4}>
       <FormControl className={classes.formControl}>
         <InputLabel shrink id="from">
           Quantity
@@ -98,7 +107,8 @@ export default function CurrencyMenu({showFilter,from,setFrom,to,setTo,filter,se
       }}/>
       <FormHelperText>Number of rates  you want to see</FormHelperText>
       </FormControl>
-      
+      </GridItem>
+      </GridContainer>
     </Card>
   );
 }

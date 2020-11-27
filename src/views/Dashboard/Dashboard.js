@@ -360,7 +360,7 @@ export default function Dashboard(props) {
         <GridItem xs={12} sm={12} md={10} key={12222}>
       <Card chart>
         <CardHeader color="primary">
-          <Charts data={data[`${to}${from}`].slice(0,quantity).reduce((prev,rate,ind)=>{
+          <Charts data={data[`${from}${to}`].slice(0,quantity).reduce((prev,rate,ind)=>{
             let date= new Date()
             date=date.setDate(date.getDate()+ind)
             console.log(prev)
