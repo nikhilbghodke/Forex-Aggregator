@@ -33,6 +33,7 @@ import Rating from '@material-ui/lab/Rating';
 import CurrencyMenu from "components/CurrencyMenu/CurrencyMenu.js"
 import Charts from 'components/Charts/Charts.js'
 import axios from "axios"
+import Alerts from "components/Alerts/Alerts"
 import { bugs, website, server } from "variables/general.js";
 
 import {
@@ -58,13 +59,13 @@ export default function Dashboard() {
   
   const getData=async ()=>{
     let res= await axios.get(`${API_URL}/allforexProviders?limit=`+quantity)
-    console.log(res.data)
+    //console.log(res.data)
     setProviders(res.data)
   }
   
   useEffect(()=>{
     getData()
-    let id=setInterval(getData,15000)
+    let id=setInterval(getData,5000)
     return ()=>clearInterval(id)
   },[quantity])
 
@@ -334,60 +335,13 @@ export default function Dashboard() {
       <CurrencyMenu showFilter={true} to={to} from={from} filter={filter} setFilter={setFilter} setFrom={setFrom} setTo={setTo} quantity={quantity} setQuantity={setQuantity}/>
 
 
+      
+
       {/* forexcard */}
       <GridContainer justify="center">
         {providers.length>0?getCards():""}
-        
-        
-
-
-        <GridItem xs={12} sm={12} md={4}>
-          <Card chart>
-            <CardHeader color="warning">
-              <ChartistGraph
-                className="ct-chart"
-                data={emailsSubscriptionChart.data}
-                type="Bar"
-                options={emailsSubscriptionChart.options}
-                responsiveOptions={emailsSubscriptionChart.responsiveOptions}
-                listener={emailsSubscriptionChart.animation}
-              />
-            </CardHeader>
-            <CardBody>
-              <h4 className={classes.cardTitle}>Email Subscriptions</h4>
-              <p className={classes.cardCategory}>Last Campaign Performance</p>
-            </CardBody>
-            <CardFooter chart>
-              <div className={classes.stats}>
-                <AccessTime /> campaign sent 2 days ago
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={4}>
-          <Card chart>
-            <CardHeader color="danger">
-              <ChartistGraph
-                className="ct-chart"
-                data={completedTasksChart.data}
-                type="Line"
-                options={completedTasksChart.options}
-                listener={completedTasksChart.animation}
-              />
-            </CardHeader>
-            <CardBody>
-              <h4 className={classes.cardTitle}>Completed Tasks</h4>
-              <p className={classes.cardCategory}>Last Campaign Performance</p>
-            </CardBody>
-            <CardFooter chart>
-              <div className={classes.stats}>
-                <AccessTime /> campaign sent 2 days ago
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
       </GridContainer>
-      
+      <Alerts providers={providers}/>  
     </div>
   );
 }

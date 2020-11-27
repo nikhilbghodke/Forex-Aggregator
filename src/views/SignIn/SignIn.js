@@ -84,7 +84,7 @@ export default function SignInSide(props) {
       console.log(res.data)
       localStorage.setItem('user', JSON.stringify(res.data));
 
-      setTokenHeader(res.token)
+      setTokenHeader(res.data.token)
       props.history.push("/admin/dashboard")
     }
     catch(e){
