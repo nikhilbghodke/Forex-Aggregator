@@ -72,14 +72,14 @@ const styles = {
         setAlerts(res.data)
     }
     useEffect(()=>{
-        let id=setInterval(getData,15000)
+        let id=setInterval(getData,5000)
         return ()=>clearInterval(id)
         getData()
     },[])
     const getAlerts=()=>{
         return(prevAlerts.map((alert,idx)=>{
             return(
-            <Card>
+            <Card key={alert._id}>
             <CardHeader color={alert.completed?"success":"danger"}>
                 <GridContainer>
                     <GridItem>Rate Set: {alert.rate}</GridItem>

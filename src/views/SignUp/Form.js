@@ -62,6 +62,17 @@ export default function Form(props) {
   const [firstname,setFirstName]=useState("")
   const [lastname,setLastName]=useState("")
   const [error,setError]=useState(null)
+  const userSignedIn= ()=>{
+    let token=localStorage.getItem("jwtToken")
+    if(token){
+      console.log(token)
+      setTokenHeader(token)
+      props.history.push("/admin/dashboard")
+    }
+    
+
+  }
+  userSignedIn()
   
   const onSubmit=async (e)=>{
     e.preventDefault();

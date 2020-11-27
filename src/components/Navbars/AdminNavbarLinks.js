@@ -3,6 +3,7 @@ import classNames from "classnames";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import MenuItem from "@material-ui/core/MenuItem";
+import Typography from '@material-ui/core/Typography';
 import MenuList from "@material-ui/core/MenuList";
 import Grow from "@material-ui/core/Grow";
 import Paper from "@material-ui/core/Paper";
@@ -19,14 +20,34 @@ import Search from "@material-ui/icons/Search";
 import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 
+import { withRouter } from "react-router";
 import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
 
 const useStyles = makeStyles(styles);
+function NotificationCard({noti}) {
+  return (
+    <MenuItem>
+    <Typography variant="inherit">{noti}</Typography>
+  </MenuItem>
+  )
+}
 
-export default function AdminNavbarLinks() {
+export default withRouter((props)=> {
   const classes = useStyles();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
+  var { user } = JSON.parse(localStorage.getItem('user'));
+  const logOut= ()=>{
+    localStorage.clear()
+    props.history.push("/signin")
+  }
+  var [notifications, setNoti] = React.useState([])
+  const getReviews = async ()=>{
+   setNoti(user.notifications)
+  }
+  React.useEffect(()=>{
+    getReviews()
+  },[])
   const handleClickNotification = event => {
     if (openNotification && openNotification.contains(event.target)) {
       setOpenNotification(null);
@@ -115,40 +136,16 @@ export default function AdminNavbarLinks() {
                   placement === "bottom" ? "center top" : "center bottom"
               }}
             >
+               
               <Paper>
                 <ClickAwayListener onClickAway={handleCloseNotification}>
-                  <MenuList role="menu">
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Mike John responded to your email
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      You have 5 new tasks
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      You{"'"}re now friend with Andrew
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Another Notification
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Another One
-                    </MenuItem>
-                  </MenuList>
+                <MenuList role="menu">
+                {notifications.map((noti, index) => {
+                return( 
+                <NotificationCard noti={noti}/>
+               )
+              })}
+                  </MenuList> 
                 </ClickAwayListener>
               </Paper>
             </Grow>
@@ -207,7 +204,7 @@ export default function AdminNavbarLinks() {
                     </MenuItem>
                     <Divider light />
                     <MenuItem
-                      onClick={handleCloseProfile}
+                      onClick={logOut}
                       className={classes.dropdownItem}
                     >
                       Logout
@@ -221,4 +218,4 @@ export default function AdminNavbarLinks() {
       </div>
     </div>
   );
-}
+})

@@ -17,6 +17,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import axios from "axios"
 import setTokenHeader from "services/api.js"
 import {API_URL} from "constants.js"
+import Dashboard from '../Dashboard/Dashboard';
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -73,22 +74,30 @@ export default function SignInSide(props) {
   const [password,setPassword] =useState("")
   const [error,setError]=useState(null)
   
+  const userSignedIn= ()=>{
+    let token=localStorage.getItem("jwtToken")
+    if(token){
+      console.log(token)
+      setTokenHeader(token)
+      props.history.push("/admin/dashboard")
+    }
+    
 
-  
+  }
+  userSignedIn()
 
   const onSubmit=async (e)=>{
     e.preventDefault();
     var res;
     try{
       res= await axios.post(`${API_URL}/login`,{email,password})
-      console.log(res.data)
+     //console.log(res.data)
       localStorage.setItem('user', JSON.stringify(res.data));
-
       setTokenHeader(res.data.token)
       props.history.push("/admin/dashboard")
     }
     catch(e){
-      console.log(e.response.data.error.message)
+      //console.log(e.response.data.error.message)
       setError(e.response.data.error.message)
     }
     
@@ -117,7 +126,6 @@ export default function SignInSide(props) {
       {getSnackBars()}
       <CssBaseline />
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
-      
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} >
         <div className={classes.paper}>
           <Avatar className={classes.avatar}>

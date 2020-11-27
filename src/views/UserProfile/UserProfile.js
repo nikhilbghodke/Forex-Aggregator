@@ -49,7 +49,8 @@ function ReviewCard({review}) {
 }
 
 
-export default function UserProfile() {
+export default function UserProfile(props) {
+  console.log(props)
   const classes = useStyles();
   var { user } = JSON.parse(localStorage.getItem('user'));
   console.log(user.about)
