@@ -1,6 +1,6 @@
 import axios from "axios";
 
-
+export const serverUrl = "http://localhost:8081"
 export default function setTokenHeader(token) {
   if (token) {
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;

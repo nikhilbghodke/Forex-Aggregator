@@ -1,6 +1,6 @@
-import React,{useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 // @material-ui/core components
-import { makeStyles,withStyles } from "@material-ui/core/styles";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 import InputLabel from "@material-ui/core/InputLabel";
 // core components
 import GridItem from "components/Grid/GridItem.js";
@@ -28,7 +28,7 @@ import {
   completedTasksChart
 } from "variables/charts.js";
 
-import { Box, IconButton, Typography } from "@material-ui/core";
+import { Box, IconButton, Input, Typography } from "@material-ui/core";
 import { ArrowDownward, NavigateBefore } from "@material-ui/icons";
 import { Link } from "react-router-dom";
 import avatar from "assets/img/faces/marc.jpg";
@@ -64,31 +64,74 @@ const StyledRating = withStyles({
   },
 })(Rating);
 const useStyles = makeStyles(styles);
-const cardStyles= makeStyles(cardStlyesObj)
+const cardStyles = makeStyles(cardStlyesObj)
+
+function ReviewCard({ review }) {
+  return (
+    <Card>
+      <GridContainer spacing={4} alignItems="center" justify="center">
+        <GridItem xs={2}>
+          <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
+          <Typography variant="caption" gutterBottom size="small">
+            {review.username}
+          </Typography>
+        </GridItem>
+        <GridItem xs={4}>
+          <Typography variant="body1" gutterBottom>
+            {review.comments}
+          </Typography>
+        </GridItem>
+        <GridItem xs={2}>
+          <Rating value={parseInt(review.stars)} readOnly size="small" />
+        </GridItem>
+      </GridContainer>
+    </Card>
+  )
+}
+
+
 
 export default function UserProfile(props) {
+  var { user } = JSON.parse(localStorage.getItem('user'));
+  console.log(user)
   const classes = useStyles();
-  const classes2= cardStyles()
-  const [provider,setProvider]=useState([])
+  const classes2 = cardStyles();
+  const [provider, setProvider] = useState([]);
+  const [User, setUser] = useState(user);
   const [value, setValue] = React.useState(3);
+  const [comment, setComment] = React.useState("");
   const [from, setFrom] = React.useState("USD");
-  const [to,setTo]=React.useState("EUR")
-  const [filter,setFilter]=React.useState("Lowest")
-  const[quantity,setQuantity]=React.useState(10)
-  const getData=async ()=>{
-    let res= await axios.get(`${API_URL}/forexProviders/`+props.match.params.name+"?limit="+quantity)
-    //console.log(res.data)
+  const [to, setTo] = React.useState("EUR")
+  const [filter, setFilter] = React.useState("Lowest")
+  const [quantity, setQuantity] = React.useState(10)
+  const [reviews, setReviews] = useState([])
+  const getData = async () => {
+    let res = await axios.get( `${API_URL}/forexProviders/${props.match.params.name}?limit=${quantity}`)
+    var rev = await axios.get(`${API_URL}/allratings/${res.data.title}`)
+    setReviews(rev.data)
     setProvider(res.data)
-    console.log(res.data)
   }
-  useEffect(()=>{
+  useEffect(() => {
     getData()
-    let id=setInterval(getData,60000)
-    return ()=>clearInterval(id)
-  },[quantity])
+    let id = setInterval(getData, 60000)
+    return () => clearInterval(id)
+  }, [quantity])
+  console.log(serverUrl)
+  const handlePost = e => {
+    e.preventDefault();
+    console.log(comment)
+    axios.post(`${serverUrl}/ratings/${provider.title}`, {
+      username : User.username,
+      stars : value,
+      comment : comment
+    }).then(res=>{
+      alert(res.data)
+      }
+    )
+  };
 
-  const getCards=()=>{
-    
+  const getCards = () => {
+
     return (
     <GridItem xs={12} sm={12} md={12} key={provider._id}>
       <Card chart>
@@ -126,14 +169,16 @@ export default function UserProfile(props) {
           <div className={classes2.stats}>
             <AccessTime /> updated {provider.rates.length!=0?(new Date().getMinutes()-new Date(provider.rates[0].createdAt).getMinutes()):0} minutes ago
           </div>
-        </CardFooter>
-      </Card>
-  </GridItem>)
+          </CardFooter>
+        </Card>
+      </GridItem>)
   }
   return (
     <div>
+      {console.log(provider)}
+      {console.log(reviews)}
       <GridContainer>
-      <GridItem xs={12} sm={12} md={4}>
+        <GridItem xs={12} sm={12} md={4}>
           <Card profile>
             <CardAvatar profile>
               <a href="#pablo" onClick={e => e.preventDefault()}>
@@ -142,41 +187,30 @@ export default function UserProfile(props) {
             </CardAvatar>
             <CardBody profile>
               <h6 className={classes.cardCategory}>Forex Provider</h6>
-              <h4 className={classes.cardTitle}>Reuters</h4>
+              <h4 className={classes.cardTitle}>{provider.title}</h4>
               <p className={classes.description}>
-                Don{"'"}t be scared of the truth because we need to restart the
-                human foundation in truth And I love you like Kanye loves Kanye
-                I love Rick Owens’ bed design but the back is...
+                {provider.about}
               </p>
               <Button color="primary" round>
-                Follow
+                {provider.contact}
               </Button>
               <p>
-              <Rating  value={4} readOnly />
+                <Rating name="read-only" value={parseInt(provider.stars)} readOnly size="small" />
               </p>
-              
             </CardBody>
           </Card>
         </GridItem>
-      <GridItem xs={12} sm={12} md={8}>
-          {provider.title?getCards():""}
-            
-
-
-
-            <CurrencyMenu showFilter={false} to={to} from={from} filter={filter} 
-            setFilter={setFilter} setFrom={setFrom} setTo={setTo}  quantity={quantity} setQuantity={setQuantity}/>
-            
-            
-            
-            
+        <GridItem xs={12} sm={12} md={8}>
+          {provider.title ? getCards() : ""}
+          <CurrencyMenu showFilter={false} to={to} from={from} filter={filter}
+            setFilter={setFilter} setFrom={setFrom} setTo={setTo} quantity={quantity} setQuantity={setQuantity} />
         </GridItem>
 
 
-        <GridItem xs={12} sm={12} md={6}>
+        {user.title && <GridItem xs={12} sm={12} md={6}>
           <Card>
             <CardHeader color="primary">
-              <h4 className={classes.cardTitleWhite}>Post something</h4>
+              <h4 className={classes.cardTitleWhite}>Post Notifications</h4>
               <p className={classes.cardCategoryWhite}>Will be shown to people following you</p>
             </CardHeader>
             <CardBody>
@@ -201,9 +235,9 @@ export default function UserProfile(props) {
               <Button color="primary">Post</Button>
             </CardFooter>
           </Card>
-        </GridItem>
+        </GridItem>}
 
-        <GridItem xs={12} sm={12} md={6}>
+        {!user.title && <GridItem xs={12} sm={12} md={6}>
           <Card>
             <CardHeader color="primary">
               <h4 className={classes.cardTitleWhite}>Review Providers</h4>
@@ -212,40 +246,44 @@ export default function UserProfile(props) {
             <CardBody>
               <GridContainer alignItems="center">
                 <GridItem xs={12} sm={12} md={12}>
-                
-                    <Typography component="legend">Ratting</Typography>
-                    <StyledRating
-                      name="simple-controlled"
-                      value={value}
-                      onChange={(event, newValue) => {
-                        setValue(newValue);
-                      }}
-                      size="large"
-                    />
-                  
-                  </GridItem>
-                  <GridItem xs={12} sm={12} md={12}>
+
+                  <Typography component="legend">Rating</Typography>
+                  <StyledRating
+                    name="simple-controlled"
+                    value={value}
+                    onChange={(event, newValue) => {
+                      setValue(newValue);
+                    }}
+                    size="large"
+                  />
+
+                </GridItem>
+                <GridItem xs={12} sm={12} md={12}>
                   <InputLabel style={{ color: "#AAAAAA" }}>Review Content</InputLabel>
-                  <CustomInput
-                    labelText="Posting regulary to stay in connect with your customers can help..."
+                  <Input
+                    labelText="Your review is important to us"
                     id="about-me"
                     formControlProps={{
                       fullWidth: true
                     }}
                     inputProps={{
                       multiline: true,
-                      rows: 5
+                      rows: 2
+                    }}
+                    onChange={(event, newValue) => {
+                      console.log(`c ${event.target.value}`)
+                      setComment(event.target.value);
                     }}
                   />
-                  
                 </GridItem>
               </GridContainer>
             </CardBody>
             <CardFooter>
-              <Button color="primary">Post</Button>
+              <Button color="primary" onClick={handlePost}>Post</Button>
             </CardFooter>
           </Card>
-        </GridItem>
+        </GridItem>}
+
 
         <GridItem xs={12} sm={12} md={6}>
           <Card>
@@ -259,25 +297,25 @@ export default function UserProfile(props) {
                   <Card>
                     <GridContainer spacing={4} alignItems="center" justify="center">
                       <GridItem xs={2}>
-                      <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
+                        <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
                       </GridItem>
-                      <GridItem xs ={7}>
+                      <GridItem xs={7}>
                         <Typography variant="body1" gutterBottom>
-                        We are happy to announce that we are oppening our new store in Banner,Pune
+                          We are happy to announce that we are oppening our new store in Banner,Pune
                         </Typography>
                       </GridItem>
-                      <GridItem xs ={3}>
+                      <GridItem xs={3}>
                         <Typography variant="caption"> Nov 21, 2020</Typography>
-                       
+
                       </GridItem>
                     </GridContainer>
                   </Card>
-                  
+
                 </GridItem>
-                
+
               </GridContainer>
             </CardBody>
-          
+
           </Card>
         </GridItem>
 
@@ -290,35 +328,20 @@ export default function UserProfile(props) {
             <CardBody>
               <GridContainer>
                 <GridItem xs={12} sm={12} md={12}>
-                  <Card>
-                    <GridContainer spacing={4} alignItems="center" justify="center">
-                      <GridItem xs={2}>
-                      <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
-                      </GridItem>
-                      <GridItem xs ={7}>
-                        <Typography variant="body1" gutterBottom>
-                          Great and Timely Service, would Consider again
-                        </Typography>
-                      </GridItem>
-                      <GridItem xs ={3}>
-                        
-                        <Rating  value={4} readOnly size="small"/>
-                        <Typography variant="caption"> Nov 21, 2020</Typography>
-                      </GridItem>
-                    </GridContainer>
-                  </Card>
-                  
+                  {reviews.map((review, index) => {
+                    return (<ReviewCard review={review} />)
+                  })}
                 </GridItem>
-                
+
               </GridContainer>
             </CardBody>
-          
+
           </Card>
         </GridItem>
         <GridItem xs={12} sm={12} md={12}>
-          <Maps/>
+          <Maps />
         </GridItem>
-        
+
       </GridContainer>
     </div>
   );

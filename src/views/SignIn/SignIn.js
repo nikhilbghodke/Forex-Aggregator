@@ -17,6 +17,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import axios from "axios"
 import setTokenHeader from "services/api.js"
 import {API_URL} from "constants.js"
+import Dashboard from '../Dashboard/Dashboard';
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -83,7 +84,6 @@ export default function SignInSide(props) {
       res= await axios.post(`${API_URL}/login`,{email,password})
       console.log(res.data)
       localStorage.setItem('user', JSON.stringify(res.data));
-
       setTokenHeader(res.token)
       props.history.push("/admin/dashboard")
     }
@@ -117,7 +117,6 @@ export default function SignInSide(props) {
       {getSnackBars()}
       <CssBaseline />
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
-      
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} >
         <div className={classes.paper}>
           <Avatar className={classes.avatar}>

@@ -48,7 +48,8 @@ import { Link } from "react-router-dom";
 import {API_URL} from "constants.js"
 const useStyles = makeStyles(styles);
 
-export default function Dashboard() {
+export default function Dashboard(props) {
+  console.log(props)
   const classes = useStyles();
   const [providers,setProviders]=useState([])
   const [from, setFrom] = React.useState("USD");
@@ -58,7 +59,6 @@ export default function Dashboard() {
   
   const getData=async ()=>{
     let res= await axios.get(`${API_URL}/allforexProviders?limit=`+quantity)
-    console.log(res.data)
     setProviders(res.data)
   }
   
@@ -115,7 +115,7 @@ export default function Dashboard() {
             let date=new Date(rate.createdAt.valueOf())
             // date.setHours(date.getHours() + 5);
             // date.setMinutes(date.getMinutes() + 30);
-            console.log(date)
+            
             prev.data.labels.unshift(date.getHours()+":"+date.getMinutes());
 
             prev.data.series[1].unshift(rate[`${from}${to}`].bid)
