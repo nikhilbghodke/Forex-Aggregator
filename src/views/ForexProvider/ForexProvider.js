@@ -93,7 +93,7 @@ function ReviewCard({ review }) {
 
 export default function UserProfile(props) {
   var { user } = JSON.parse(localStorage.getItem('user'));
-  console.log(user)
+  
   const classes = useStyles();
   const classes2 = cardStyles();
   const [provider, setProvider] = useState([]);
@@ -105,6 +105,7 @@ export default function UserProfile(props) {
   const [filter, setFilter] = React.useState("Lowest")
   const [quantity, setQuantity] = React.useState(10)
   const [reviews, setReviews] = useState([])
+  const [post,setPost]=useState("")
   const getData = async () => {
     let res = await axios.get( `${API_URL}/forexProviders/${props.match.params.name}?limit=${quantity}`)
     var rev = await axios.get(`${API_URL}/allratings/${res.data.title}`)
@@ -129,6 +130,14 @@ export default function UserProfile(props) {
       }
     )
   };
+  const pushNotification=async ()=>{
+    let res=await axios.post(`${API_URL}/notification`, {
+      title : props.match.params.name,
+      notification : post
+    })
+    console.log(res)
+    setPost("")
+  }
 
   const getCards = () => {
 
@@ -227,12 +236,15 @@ export default function UserProfile(props) {
                       multiline: true,
                       rows: 5
                     }}
+                    onChange={(event, newValue) => {
+                      setPost(newValue);
+                    }}
                   />
                 </GridItem>
               </GridContainer>
             </CardBody>
             <CardFooter>
-              <Button color="primary">Post</Button>
+              <Button color="primary" onClick={pushNotification}>Post</Button>
             </CardFooter>
           </Card>
         </GridItem>}

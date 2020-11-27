@@ -54,14 +54,14 @@ const dashboardRoutes = [
     component: UserProfile,
     layout: "/admin"
   },
-  {
-    path: "/user",
-    name: "Learning",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: LibraryBooksIcon,
-    component: UserProfile,
-    layout: "/admin"
-  },
+  // {
+  //   path: "/user",
+  //   name: "Learning",
+  //   rtlName: "ملف تعريفي للمستخدم",
+  //   icon: LibraryBooksIcon,
+  //   component: UserProfile,
+  //   layout: "/admin"
+  // },
 
   // {
   //   path: "/table",
@@ -80,22 +80,22 @@ const dashboardRoutes = [
   //   layout: "/admin"
   // },
   
-  {
-    path: "/maps",
-    name: "Maps",
-    rtlName: "خرائط",
-    icon: LocationOn,
-    component: Maps,
-    layout: "/admin"
-  },
-  {
-    path: "/notifications",
-    name: "Notifications",
-    rtlName: "إخطارات",
-    icon: Notifications,
-    component: NotificationsPage,
-    layout: "/admin"
-  },
+  // {
+  //   path: "/maps",
+  //   name: "Maps",
+  //   rtlName: "خرائط",
+  //   icon: LocationOn,
+  //   component: Maps,
+  //   layout: "/admin"
+  // },
+  // {
+  //   path: "/notifications",
+  //   name: "Notifications",
+  //   rtlName: "إخطارات",
+  //   icon: Notifications,
+  //   component: NotificationsPage,
+  //   layout: "/admin"
+  // },
   
   {
     path: "/provider/:name",
