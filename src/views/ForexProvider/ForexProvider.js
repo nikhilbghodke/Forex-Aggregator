@@ -35,7 +35,8 @@ import avatar from "assets/img/faces/marc.jpg";
 import cardStlyesObj from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import cardStyle from "assets/jss/material-dashboard-react/components/cardStyle";
 import axios from "axios"
-import {API_URL} from "constants.js"
+import { API_URL } from "constants.js"
+import { array } from "prop-types";
 
 const styles = {
   cardCategoryWhite: {
@@ -89,15 +90,32 @@ function ReviewCard({ review }) {
   )
 }
 
+function NotificationCard({ notis }) {
+  return (
+    <Card>
+      <GridContainer spacing={4} alignItems="center" justify="center">
+        <GridItem xs={2}>
+          <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
+        </GridItem>
+        <GridItem xs={7}>
+          <Typography variant="body1" gutterBottom>
+           {notis}
+          </Typography>
+        </GridItem>
+      </GridContainer>
+    </Card>
+  )
+}
 
 
 export default function UserProfile(props) {
   var { user } = JSON.parse(localStorage.getItem('user'));
-  
+
   const classes = useStyles();
   const classes2 = cardStyles();
   const [provider, setProvider] = useState([]);
   const [User, setUser] = useState(user);
+  const [noti, setNoti] = useState(["Post will be shown here"]);
   const [value, setValue] = React.useState(3);
   const [comment, setComment] = React.useState("");
   const [from, setFrom] = React.useState("USD");
@@ -105,12 +123,17 @@ export default function UserProfile(props) {
   const [filter, setFilter] = React.useState("Lowest")
   const [quantity, setQuantity] = React.useState(10)
   const [reviews, setReviews] = useState([])
-  const [post,setPost]=useState("")
+  const [post, setPost] = useState("")
+  const[disable,setDisable]=useState(false)
+  var owner = false;
   const getData = async () => {
-    let res = await axios.get( `${API_URL}/forexProviders/${props.match.params.name}?limit=${quantity}`)
+    let res = await axios.get(`${API_URL}/forexProviders/${props.match.params.name}?limit=${quantity}`)
     var rev = await axios.get(`${API_URL}/allratings/${res.data.title}`)
+    let posts = await axios.get(`${API_URL}/notifications/${res.data.title}`)
     setReviews(rev.data)
     setProvider(res.data)
+    setNoti(posts.data)
+    setShow(user,res.data)
   }
   useEffect(() => {
     getData()
@@ -122,61 +145,89 @@ export default function UserProfile(props) {
     e.preventDefault();
     console.log(comment)
     axios.post(`${API_URL}/ratings/${provider.title}`, {
-      username : User.username,
-      stars : value,
-      comment : comment
-    }).then(res=>{
+      username: User.username,
+      stars: value,
+      comment: comment
+    }).then(res => {
       alert(res.data)
-      }
+      reviews = [...reviews, res.data]
+      setReviews(reviews)
+    }
     )
   };
-  const pushNotification=async ()=>{
-    let res=await axios.post(`${API_URL}/notification`, {
-      title : props.match.params.name,
-      notification : post
+  const pushNotification = e => {
+    console.log(post)
+    console.log(provider.title)
+    axios.post(`${API_URL}/notification`, {
+      title: provider.title,
+      notification: post
+    }).then(res => {
+      console.log(res.data)
+      setNoti(res.data)
+      setPost("")
+      console.log(noti)
     })
-    console.log(res)
-    setPost("")
   }
+  const sendFollow = e => {
+    console.log(post)
+    axios.post(`${API_URL}/follow/${provider.title}`, {
+      email: user.email
+    }).then(res => {
+      console.log(res.data)
+      setDisable(true)
+    })
+  }
+function setShow(user,provider){
+    if(!user.title){
+      provider.users.forEach(email => {
+        if(user.email == email){
+          setDisable(true)
+        }
+      });
+    }
+    if(user.title)
+      setDisable(true)
+}
 
   const getCards = () => {
-
+    if(user.title == provider.title)
+    owner = true
     return (
-    <GridItem xs={12} sm={12} md={12} key={provider._id}>
-      <Card chart>
-        <CardHeader color="success">
-          <Charts data={provider.rates.reduce((prev,rate)=>{
-            let date=new Date(rate.createdAt.valueOf())
-            prev.data.labels.unshift(date.getHours()+":"+date.getMinutes());
-            prev.data.series[1].unshift(rate[`${from}${to}`].bid)
-            prev.data.series[2].unshift(rate[`${from}${to}`].ask)
-            prev.low=Math.min(prev.low,rate[`${from}${to}`].bid)
-            prev.high=Math.max(prev.high,rate[`${from}${to}`].ask)
-            return prev
-          },{data:{labels:[],series:[[],[],[]]},high:0,low:100})}/>
-        </CardHeader>
-        <CardBody>
-          <Link to={"provider/"+provider.title}>
-        
-          <p className={classes2.cardCategory}>
-            Bid rate{"  "}
-            <span className={classes2.successText}>
-              <ArrowUpward className={classes2.upArrowCardCategory} /> {provider.rates.length!=0?provider.rates[0][`${from}${to}`].bid:0}
-            </span>
-          </p>
-          <p className={classes2.cardCategory}>
-            Offer rate {"  "}
-            <span className={classes2.dangerText}>
-              <ArrowDownward className={classes2.upArrowCardCategory} /> {provider.rates.length!=0?provider.rates[0][`${from}${to}`].ask:0}
-            </span>
-            
-          </p>
-          </Link>
-        </CardBody>
-        
-        <CardFooter chart>
-          <div className={classes2.stats}>
-            <AccessTime /> updated {provider.rates.length!=0?(new Date().getMinutes()-new Date(provider.rates[0].createdAt).getMinutes()):0} minutes ago
+      <GridItem xs={12} sm={12} md={12} key={provider._id}>
+        <Card chart>
+          <CardHeader color="success">
+            <Charts data={provider.rates.reduce((prev, rate) => {
+              let date = new Date(rate.createdAt.valueOf())
+              prev.data.labels.unshift(date.getHours() + ":" + date.getMinutes());
+              prev.data.series[1].unshift(rate[`${from}${to}`].bid)
+              prev.data.series[2].unshift(rate[`${from}${to}`].ask)
+              prev.low = Math.min(prev.low, rate[`${from}${to}`].bid)
+              prev.high = Math.max(prev.high, rate[`${from}${to}`].ask)
+              return prev
+            }, { data: { labels: [], series: [[], [], []] }, high: 0, low: 100 })} />
+          </CardHeader>
+          <CardBody>
+            <Link to={"provider/" + provider.title}>
+
+              <p className={classes2.cardCategory}>
+                Bid rate{"  "}
+                <span className={classes2.successText}>
+                  <ArrowUpward className={classes2.upArrowCardCategory} /> {provider.rates.length != 0 ? provider.rates[0][`${from}${to}`].bid : 0}
+                </span>
+              </p>
+              <p className={classes2.cardCategory}>
+                Offer rate {"  "}
+                <span className={classes2.dangerText}>
+                  <ArrowDownward className={classes2.upArrowCardCategory} /> {provider.rates.length != 0 ? provider.rates[0][`${from}${to}`].ask : 0}
+                </span>
+
+              </p>
+            </Link>
+          </CardBody>
+
+          <CardFooter chart>
+            <div className={classes2.stats}>
+              <AccessTime /> updated {provider.rates.length != 0 ? (new Date().getMinutes() - new Date(provider.rates[0].createdAt).getMinutes()) : 0} minutes ago
           </div>
           </CardFooter>
         </Card>
@@ -200,10 +251,13 @@ export default function UserProfile(props) {
               <p className={classes.description}>
                 {provider.about}
               </p>
-              <Button color="primary" round>
-                {provider.contact}
+              <Button color="primary" round onClick={sendFollow} disabled={disable}>
+                Click to Follow
               </Button>
               <p>
+                <p className={classes.description}>
+                  {provider.contact}
+                </p>
                 <Rating name="read-only" value={parseInt(provider.stars)} readOnly size="small" />
               </p>
             </CardBody>
@@ -216,7 +270,7 @@ export default function UserProfile(props) {
         </GridItem>
 
 
-        {user.title && <GridItem xs={12} sm={12} md={6}>
+        {user.title && owner && <GridItem xs={12} sm={12} md={6}>
           <Card>
             <CardHeader color="primary">
               <h4 className={classes.cardTitleWhite}>Post Notifications</h4>
@@ -226,7 +280,7 @@ export default function UserProfile(props) {
               <GridContainer>
                 <GridItem xs={12} sm={12} md={12}>
                   <InputLabel style={{ color: "#AAAAAA" }}>Post Content</InputLabel>
-                  <CustomInput
+                  <Input
                     labelText="Posting regulary to stay in connect with your customers can help..."
                     id="about-me"
                     formControlProps={{
@@ -306,22 +360,9 @@ export default function UserProfile(props) {
             <CardBody>
               <GridContainer>
                 <GridItem xs={12} sm={12} md={12}>
-                  <Card>
-                    <GridContainer spacing={4} alignItems="center" justify="center">
-                      <GridItem xs={2}>
-                        <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
-                      </GridItem>
-                      <GridItem xs={7}>
-                        <Typography variant="body1" gutterBottom>
-                          We are happy to announce that we are oppening our new store in Banner,Pune
-                        </Typography>
-                      </GridItem>
-                      <GridItem xs={3}>
-                        <Typography variant="caption"> Nov 21, 2020</Typography>
-
-                      </GridItem>
-                    </GridContainer>
-                  </Card>
+                {noti.map((notis, index) => {
+                    return (<NotificationCard notis={notis} />)
+                  })}
 
                 </GridItem>
 
