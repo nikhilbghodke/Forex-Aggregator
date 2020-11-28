@@ -37,12 +37,15 @@ export default withRouter((props)=> {
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
   var { user } = JSON.parse(localStorage.getItem('user'));
+  var [notifications, setNoti] = React.useState([])
+ 
+    
   const logOut= ()=>{
     localStorage.clear()
     props.history.push("/signin")
   }
-  var [notifications, setNoti] = React.useState([])
   const getReviews = async ()=>{
+    console.log(user.notifications)
    setNoti(user.notifications)
   }
   React.useEffect(()=>{
