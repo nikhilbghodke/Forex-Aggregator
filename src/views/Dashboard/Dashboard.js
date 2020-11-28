@@ -280,9 +280,9 @@ export default function Dashboard(props) {
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Alerts Set/Fulfilled</p>
+              <p className={classes.cardCategory}>Alerts Fulfiled/Set</p>
               <h3 className={classes.cardTitle}>
-                49/100 
+                10/15
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -300,7 +300,7 @@ export default function Dashboard(props) {
                 <Store />
               </CardIcon>
               <p className={classes.cardCategory}>Forex Providers</p>
-              <h3 className={classes.cardTitle}>10</h3>
+              <h3 className={classes.cardTitle}>3</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -334,7 +334,7 @@ export default function Dashboard(props) {
                 <Accessibility />
               </CardIcon>
               <p className={classes.cardCategory}>Users</p>
-              <h3 className={classes.cardTitle}>+245</h3>
+              <h3 className={classes.cardTitle}>+5</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>

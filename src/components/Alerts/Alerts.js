@@ -37,6 +37,15 @@ import cardStlyesObj from "assets/jss/material-dashboard-react/views/dashboardSt
 import cardStyle from "assets/jss/material-dashboard-react/components/cardStyle";
 import axios from "axios"
 import {API_URL} from "constants.js"
+import {
+    successColor,
+    whiteColor,
+    grayColor,
+    hexToRgb,
+    dangerColor
+  } from "assets/jss/material-dashboard-react.js";
+
+//import styles2 from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 const styles = {
     cardCategoryWhite: {
       color: "rgba(255,255,255,.62)",
@@ -53,12 +62,35 @@ const styles = {
       fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
       marginBottom: "3px",
       textDecoration: "none"
-    }
+    },
+    stats: {
+        color: grayColor[0],
+        display: "inline-flex",
+        fontSize: "12px",
+        lineHeight: "22px",
+        "& svg": {
+          top: "4px",
+          width: "16px",
+          height: "16px",
+          position: "relative",
+          marginRight: "3px",
+          marginLeft: "3px"
+        },
+        "& .fab,& .fas,& .far,& .fal,& .material-icons": {
+          top: "4px",
+          fontSize: "16px",
+          position: "relative",
+          marginRight: "3px",
+          marginLeft: "3px"
+        }
+      }
   };
   const useStyles = makeStyles(styles);
 
+
   export default function Alerts(props) {
     const classes = useStyles();
+
     const [providers,setProviders]=React.useState([])
     const [from, setFrom] = React.useState("USD");
     const [to,setTo]=React.useState("EUR")
@@ -82,20 +114,26 @@ const styles = {
             <Card key={alert._id}>
             <CardHeader color={alert.completed?"success":"danger"}>
                 <GridContainer>
-                    <GridItem>Rate Set: {alert.rate}</GridItem>
-                    <GridItem>Curenncy: {alert.currency}</GridItem>
-                    <GridItem>Trade: {alert.bidask}</GridItem>
-                    <GridItem>Saved: {alert.saved}</GridItem>
+                    <GridItem xs={12} md={4}>Rate Set: {alert.rate}</GridItem>
+                    <GridItem xs={12} md={4}>Curenncy: {alert.currency}</GridItem>
+                    <GridItem xs={12} md={4}>Trade: {alert.bidask}</GridItem>
+                   
                 </GridContainer>
-            
+                
             </CardHeader>
             <CardBody>
+                <GridContainer>
+                    
+                    {alert.completed&&<Link to={`/admin/provider/${alert.trader}`}><GridItem xs={12} >Trader who completed: {alert.trader}</GridItem></Link>}
+                    {alert.completed&&<GridItem xs={12} >Saved: {alert.saved}</GridItem>}
+                    
+                </GridContainer>
             </CardBody>
             <CardFooter>
-            <GridContainer>
-                    <GridItem xs={12} md={4}>Created at {(new Date(alert.createdAt)).toLocaleTimeString()}</GridItem>
-                    <GridItem xs={12} md={4}>Completed at {(new Date(alert.createdAt)).toLocaleTimeString()}</GridItem>
-                    <GridItem xs={12} md={4}><Button color="danger" onClick={()=>{
+            <GridContainer justify="space-between">
+                    <GridItem className={classes.stats} xs={12} md={4}>Created at {(new Date(alert.createdAt)).toLocaleTimeString()}</GridItem>
+                    {alert.completed&&<GridItem xs={12} md={4}>Completed at {(new Date(alert.createdAt)).toLocaleTimeString()}</GridItem>}
+                    <GridItem  className={classes.stats} xs={12} md={4}><Button color="danger" onClick={()=>{
                         handleDelete(alert._id)
                     }}>delete</Button></GridItem>
                 </GridContainer>
